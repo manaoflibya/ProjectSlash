@@ -8,9 +8,34 @@ public class ShakeSlash : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore" });
+		PublicIncludePaths.AddRange(
+	        new string[]
+	        {
+        		"ShakeSlash",
+		        "ShakeSlash/Mode",
+		        "ShakeSlash/Character",
+		        "ShakeSlash/Utility",
+	        });
+		
+		PublicDependencyModuleNames.AddRange(
+			new string[]
+			{
+				"Core",
+				"CoreUObject",
+				"Engine",
+				"InputCore",
+				"HeadMountedDisplay",
+				"XRBase",
+				"UMG",
+				"Slate",
+				"SlateCore",
+			});
 
-		PrivateDependencyModuleNames.AddRange(new string[] {  });
+		PrivateDependencyModuleNames.AddRange(
+			new string[]
+			{
+				
+			});
 
 		// Uncomment if you are using Slate UI
 		// PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });

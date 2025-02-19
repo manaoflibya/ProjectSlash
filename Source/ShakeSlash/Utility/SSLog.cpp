@@ -1,0 +1,6 @@
+#include "SSLog.h"
+
+
+DEFINE_LOG_CATEGORY(SSLogCharacter);
+DEFINE_LOG_CATEGORY(SSLogMode);
+DEFINE_LOG_CATEGORY(SSLogUtility);
