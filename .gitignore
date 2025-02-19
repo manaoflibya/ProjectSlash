@@ -1,5 +1,6 @@
 # Visual Studio 2015 user specific files
 .vs/
+enc_temp_folder/
 
 # Compiled Object files
 *.slo
@@ -26,7 +27,6 @@
 *.lib
 
 # Executables
-*.exe
 *.out
 *.app
 *.ipa
@@ -40,6 +40,8 @@
 *.sdf
 *.VC.db
 *.VC.opendb
+*.vcxproj*
+*.tlog
 
 # Precompiled Assets
 SourceArt/**/*.png
@@ -72,3 +74,27 @@ Plugins/**/Intermediate/*
 
 # Cache files for the editor to use
 DerivedDataCache/*
+
+# misc
+.idea/*
+*.log
+*.pyc
+*.patch*
+
+# Rider files
+.idea/*
+Plugins/Developer/RiderLink/
+
+# vsconfig
+*.vsconfig
+*.htm
+
+# Contents Developer
+Content/Developers/*
+
+# Tools
+Tools/**/.idea/*
+Tools/**/.vs/*
+Tools/**/Release/*
+Tools/**/Debug/*
+!Tools/**/*sln
