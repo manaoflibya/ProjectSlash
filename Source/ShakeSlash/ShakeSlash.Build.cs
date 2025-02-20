@@ -29,6 +29,7 @@ public class ShakeSlash : ModuleRules
 				"UMG",
 				"Slate",
 				"SlateCore",
+				"EnhancedInput",
 			});
 
 		PrivateDependencyModuleNames.AddRange(

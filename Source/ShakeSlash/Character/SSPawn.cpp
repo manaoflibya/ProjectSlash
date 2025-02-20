@@ -1,46 +1,92 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "SSPawn.h"
-#include "MotionControllerComponent.h"
 #include "Camera/CameraComponent.h"
+#include "MotionControllerComponent.h"
+#include "Components/SkeletalMeshComponent.h"
+#include "EnhancedInputSubsystems.h"
+#include "EnhancedInputComponent.h"
+#include "ShaderPrintParameters.h"
+#include "Animation/AnimInstance.h"
+#include "AnimInstance/SSHandAnimInstance.h"
 
-
-// Sets default values
 ASSPawn::ASSPawn()
 {
-	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+    PrimaryActorTick.bCanEverTick = true;
 
-	// VR 카메라 설정
-	VRCamera = CreateDefaultSubobject<UCameraComponent>(CameraName);
-	VRCamera->SetupAttachment(RootComponent);
+    VRRoot = CreateDefaultSubobject<USceneComponent>(TEXT("VRRoot"));
+    RootComponent = VRRoot;
 
-	// 왼손 및 오른손 컨츠롤러 추가
-	LeftController = CreateDefaultSubobject<UMotionControllerComponent>(LeftControllerName);
-	LeftController->SetupAttachment(RootComponent);
-	LeftController->SetTrackingSource(EControllerHand::Left);
-	RightController = CreateDefaultSubobject<UMotionControllerComponent>(RightControllerName);
-	RightController->SetupAttachment(RootComponent);
-	RightController->SetTrackingSource(EControllerHand::Right); 
+    Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+    Camera->SetupAttachment(VRRoot);
+
+    LeftController = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("LeftController"));
+    LeftController->SetupAttachment(VRRoot);
+    LeftController->SetTrackingSource(EControllerHand::Left);
+
+    RightController = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("RightController"));
+    RightController->SetupAttachment(VRRoot);
+    RightController->SetTrackingSource(EControllerHand::Right);
+
+    LeftHandMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("LeftHandMesh"));
+    LeftHandMesh->SetupAttachment(LeftController);
+
+    RightHandMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("RightHandMesh"));
+    RightHandMesh->SetupAttachment(RightController);
 }
 
-// Called when the game starts or when spawned
 void ASSPawn::BeginPlay()
 {
-	Super::BeginPlay();
-	
+    Super::BeginPlay();
+
+    LeftHandAnim = Cast<USSHandAnimInstance>(LeftHandMesh->GetAnimInstance());
+    RightHandAnim = Cast<USSHandAnimInstance>(RightHandMesh->GetAnimInstance());
+    
+    // Enhanced Input 적용
+    if (APlayerController* PC = Cast<APlayerController>(GetController()))
+    {
+        if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer()))
+        {
+            Subsystem->AddMappingContext(InputMapping, 0);
+        }
+    }
 }
 
-// Called every frame
-void ASSPawn::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-}
-
-// Called to bind functionality to input
 void ASSPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
+    Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+    UEnhancedInputComponent* EnhancedInput = Cast<UEnhancedInputComponent>(PlayerInputComponent);
+    if (EnhancedInput)
+    {
+        EnhancedInput->BindAction(IA_GrabPressedLeft, ETriggerEvent::Triggered, this, &ASSPawn::SetLeftHandState);
+        EnhancedInput->BindAction(IA_GrabPressedRight, ETriggerEvent::Triggered, this, &ASSPawn::SetRightHandState);
+    }
 }
 
+void ASSPawn::Tick(float DeltaTime)
+{
+    Super::Tick(DeltaTime);
+}
+
+void ASSPawn::SetLeftHandState(const FInputActionValue& Value)
+{
+    float AxisValue = Value.Get<float>();
+    
+    UE_LOG(LogTemp, Warning, TEXT("yoo Left Hand GRAB Value %f"), AxisValue);
+    
+    if (IsValid(LeftHandAnim))
+    {
+        LeftHandAnim->GrabStregth = AxisValue;
+    }
+}
+
+void ASSPawn::SetRightHandState(const FInputActionValue& Value)
+{
+    float AxisValue = Value.Get<float>();
+    
+    UE_LOG(LogTemp, Warning, TEXT("yoo Right Hand GRAB Value %f"), AxisValue);
+
+    if (IsValid(RightHandAnim))
+    {
+        
+    }
+}

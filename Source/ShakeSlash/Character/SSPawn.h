@@ -4,7 +4,20 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
+#include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
+#include "InputActionValue.h"
 #include "SSPawn.generated.h"
+
+UENUM(BlueprintType)
+enum class EHandState : uint8
+{
+	Open     UMETA(DisplayName = "Open"),
+	Fist     UMETA(DisplayName = "Fist"),
+	Grab     UMETA(DisplayName = "Grab"),
+	Pointing UMETA(DisplayName = "Pointing")
+};
+
 
 UCLASS()
 class SHAKESLASH_API ASSPawn : public APawn
@@ -15,30 +28,64 @@ public:
 	// Sets default values for this pawn's properties
 	ASSPawn();
 
+
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
 public:
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "VR")
+	class USceneComponent* VRRoot;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "VR")
+	class UCameraComponent* Camera;
 
-private:
-	UPROPERTY(VisibleAnywhere)
-	class UCameraComponent* VRCamera;
-
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "VR")
 	class UMotionControllerComponent* LeftController;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "VR")
 	class UMotionControllerComponent* RightController;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "VR")
+	class USkeletalMeshComponent* LeftHandMesh;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "VR")
+	class USkeletalMeshComponent* RightHandMesh;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VR")
+	EHandState LeftHandState;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VR")
+	EHandState RightHandState;
+	
+	UPROPERTY(visibleAnywhere, BlueprintReadOnly, Category = "VR")
+	float LeftGrabValue;
+	
+	UPROPERTY(visibleAnywhere, BlueprintReadOnly, Category = "VR")
+	float RightGrabValue;
+	
+	// Enhanced Input 설정
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enhanced Input")
+	class UInputMappingContext* InputMapping;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enhanced Input")
+	class UInputAction* IA_GrabPressedLeft;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enhanced Input")
+	class UInputAction* IA_GrabPressedRight;
+	
+	TObjectPtr<class USSHandAnimInstance> LeftHandAnim;
+	TObjectPtr<class USSHandAnimInstance> RightHandAnim;
+	
+	void SetLeftHandState(const FInputActionValue& Value);
+	void SetRightHandState(const FInputActionValue& Value);
+	
+	
 private:
 	FName CameraName = TEXT("VRCamera");
 	FName LeftControllerName = TEXT("LeftController");
 	FName RightControllerName = TEXT("RightController");
 };
+
